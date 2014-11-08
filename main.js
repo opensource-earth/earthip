@@ -53,6 +53,15 @@
 			placemark.setGeometry(point);
 			// 向 Google 地球添加地标。
 			ge.getFeatures().appendChild(placemark);
+			
+			
+			// 获取当前视图。
+			var lookAt = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
+			// 设置新的纬度值和经度值。
+			lookAt.setLatitude(39.98881);
+			lookAt.setLongitude(116.474828);
+			// 更新 Google 地球中的视图。
+			ge.getView().setAbstractView(lookAt);
 		}
 	};
 	earthip.view = function(ctrl) {
