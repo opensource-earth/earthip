@@ -1,23 +1,23 @@
 (function() {
-	// var ge;
-//     google.load("earth", "1", {'language': 'zh_cn' , "other_params":"sensor=false"});
-//
-//     function init() {
-// 		google.earth.createInstance('map3d', initCB, failureCB);
-//     }
-//
-//     function initCB(instance) {
-//       ge = instance;
-//       ge.getWindow().setVisibility(true);
-// 	  ge.getNavigationControl().setVisibility(ge.VISIBILITY_SHOW);
-//
-// 	  // earthip.overlay();
-//     }
-//
-//     function failureCB(errorCode) {
-//     }
-//
-//     google.setOnLoadCallback(init);
+	var ge;
+    google.load("earth", "1", {'language': 'zh_cn' , "other_params":"sensor=false"});
+
+    function init() {
+		google.earth.createInstance('map3d', initCB, failureCB);
+    }
+
+    function initCB(instance) {
+      ge = instance;
+      ge.getWindow().setVisibility(true);
+	  ge.getNavigationControl().setVisibility(ge.VISIBILITY_SHOW);
+
+	  // earthip.overlay();
+    }
+
+    function failureCB(errorCode) {
+    }
+
+    google.setOnLoadCallback(init);
 	
 	
 	/***** ip.. ****/
