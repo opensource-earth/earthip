@@ -1,23 +1,23 @@
 (function() {
-	var ge;
-    google.load("earth", "1", {'language': 'zh_cn' , "other_params":"sensor=false"});
-
-    function init() {
-		google.earth.createInstance('map3d', initCB, failureCB);
-    }
-
-    function initCB(instance) {
-      ge = instance;
-      ge.getWindow().setVisibility(true);
-	  ge.getNavigationControl().setVisibility(ge.VISIBILITY_SHOW);
-	  
-	  // earthip.overlay();
-    }
-
-    function failureCB(errorCode) {
-    }
-
-    google.setOnLoadCallback(init);
+	// var ge;
+//     google.load("earth", "1", {'language': 'zh_cn' , "other_params":"sensor=false"});
+//
+//     function init() {
+// 		google.earth.createInstance('map3d', initCB, failureCB);
+//     }
+//
+//     function initCB(instance) {
+//       ge = instance;
+//       ge.getWindow().setVisibility(true);
+// 	  ge.getNavigationControl().setVisibility(ge.VISIBILITY_SHOW);
+//
+// 	  // earthip.overlay();
+//     }
+//
+//     function failureCB(errorCode) {
+//     }
+//
+//     google.setOnLoadCallback(init);
 	
 	
 	/***** ip.. ****/
@@ -132,17 +132,22 @@
 		ge.getView().setAbstractView(lookAt);
 	};
 	earthip.controller = function() {
-		this.selectedIp= m.prop("122.124.137.19");
+		this.selectedIp = m.prop("122.124.137.19");
+		this.selectedSubIp = m.prop("");
 		this.attip = earthip.IpData();
 
 		this.selected = function(index) {
 			this.selectedIp(index.target.innerText);
+			this.selectedSubIp("");
 			m.redraw(true);
 			
 			earthip.removeAll();
 			earthip.showGroupIp(index.target.innerText);
 		}.bind(this);
 		this.attipSelected = function(index) {
+			this.selectedSubIp(index.target.innerText);
+			m.redraw(true);
+			
 			earthip.removeAll();
 			earthip.showSingleIp(index.target.innerText);
 			// // 获取当前视图。
@@ -153,13 +158,21 @@
 			// lookAt.setRange(5000.0);
 			// // 更新 Google 地球中的视图。
 			// ge.getView().setAbstractView(lookAt);
-		}
+		}.bind(this);
 	};
 	earthip.view = function(ctrl) {
 		return [m("div.pure-u-1-2", m("ul", [m("li.head", "攻击者IP"), earthip.attData.map(function(item, iIndex) {
-			return m("li", m("a[href='#']", {onclick: ctrl.selected}, item));
+			if (item == ctrl.selectedIp()) {
+				return m("li", m("a.highlighted[href='#']", {onclick: ctrl.selected}, item));
+			} else {
+				return m("li", m("a[href='#']", {onclick: ctrl.selected}, item));
+			}
 		})])), m("div.pure-u-1-2", m("ul", [m("li.head", "被攻击者IP"), earthip.allData[ctrl.selectedIp()].map(function(item, iIndex) {
-			return m("li", m("a[href='#']", {onclick: ctrl.attipSelected}, item));
+			if (item == ctrl.selectedSubIp()) {
+				return m("li", m("a.selected[href='#']", {onclick: ctrl.attipSelected}, item));
+			} else {
+				return m("li", m("a[href='#']", {onclick: ctrl.attipSelected}, item));
+			}
 		})]))];
 	};
 
