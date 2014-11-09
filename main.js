@@ -1,15 +1,17 @@
 (function() {
 	var ge;
-    google.load("earth", "1", {"other_params":"sensor=false"});
+    google.load("earth", "1", {'language': 'en' , "other_params":"sensor=false"});
 
     function init() {
-      google.earth.createInstance('map3d', initCB, failureCB);
+		google.earth.createInstance('map3d', initCB, failureCB);
     }
 
     function initCB(instance) {
       ge = instance;
       ge.getWindow().setVisibility(true);
 	  ge.getNavigationControl().setVisibility(ge.VISIBILITY_SHOW);
+	  
+	  // earthip.overlay();
     }
 
     function failureCB(errorCode) {
@@ -31,6 +33,27 @@
 			}
 			earthip.allData = data;
 		});
+	};
+	earthip.overlay = function() {
+		var element = document.getElementById("map3d");
+		// 创建 ScreenOverlay
+		var screenOverlay = ge.createScreenOverlay('');
+		// 指定图片路径，并设置图标
+		var icon = ge.createIcon('');
+		icon.setHref('http://www.google.com/intl/en_ALL/images/logo.gif');
+		screenOverlay.setIcon(icon);
+		// 设置ScreenOverlay在窗口中的位置
+		screenOverlay.getOverlayXY().setXUnits(ge.UNITS_PIXELS);
+		screenOverlay.getOverlayXY().setYUnits(ge.UNITS_PIXELS);
+		screenOverlay.getOverlayXY().setX(element.clientWidth / 2);
+		screenOverlay.getOverlayXY().setY(element.clientHeight / 2);
+		// 设置叠加层的尺寸（以像素为单位）
+		screenOverlay.getSize().setXUnits(ge.UNITS_PIXELS);
+		screenOverlay.getSize().setYUnits(ge.UNITS_PIXELS);
+		screenOverlay.getSize().setX(element.clientWidth);
+		screenOverlay.getSize().setY(element.clientHeight);
+		// 向Google地球添加 ScreenOverlay
+		ge.getFeatures().appendChild(screenOverlay);
 	};
 	earthip.getIpCoord = function(ipStr) {
 		var coord = new earthip.coord;
