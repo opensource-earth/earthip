@@ -1,6 +1,6 @@
 (function() {
 	var ge;
-    google.load("earth", "1", {'language': 'en' , "other_params":"sensor=false"});
+    google.load("earth", "1", {'language': 'zh_cn' , "other_params":"sensor=false"});
 
     function init() {
 		google.earth.createInstance('map3d', initCB, failureCB);
