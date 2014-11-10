@@ -118,7 +118,7 @@
 
         ge.getOptions().setFlyToSpeed(0.5);
         var lookAt = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
-        lookAt.setTilt(lookAt.getTilt() + 15.0);
+        lookAt.setTilt(35.0);
  
   	    var la = ge.createLookAt('');
 		la.set(attCoord[0], attCoord[1], 0, ge.ALTITUDE_RELATIVE_TO_GROUND, -8.541, 66.213, 8000);
@@ -134,7 +134,7 @@
         ge.getOptions().setFlyToSpeed(0.5);
  
 		var lookAt = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
-        lookAt.setTilt(lookAt.getTilt() + 15.0);
+        lookAt.setTilt(35.0);
 		// 设置新的纬度值和经度值。
 		lookAt.setLatitude(attCoord[0]);
 		lookAt.setLongitude(attCoord[1]);
