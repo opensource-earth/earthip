@@ -150,7 +150,7 @@
 			var lineStyle = lineMark.getStyleSelector().getLineStyle();
 			lineStyle.setWidth(2);  //粗细
 			lineStyle.getColor().set('9900ffff'); //颜色
-			ge.getFeatures().appendChild(lineMark );
+			ge.getFeatures().appendChild(lineMark);
 			
 			//添加点
 			earthip.addPoint(ipCoord, ipCoord["address"] + "(被窃文件10个)");
