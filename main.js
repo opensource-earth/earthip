@@ -11,9 +11,15 @@
       ge.getWindow().setVisibility(true);
 	  ge.getNavigationControl().setVisibility(ge.VISIBILITY_SHOW);
 
-	  // earthip.overlay();
+	  // var href = 'http://developers.google.com/kml/documentation/kmlfiles/bounce_example.kml';
+	  // google.earth.fetchKml(ge, href, kmlFinishedLoading);
     }
 
+	// function kmlFinishedLoading(object) {
+	//    ge.getTourPlayer().setTour(object);
+	//    ge.getTourPlayer().play();
+	// }
+	
     function failureCB(errorCode) {
     }
 
@@ -25,13 +31,17 @@
 	var earthip = {};
 	earthip.attData = [];
 	earthip.allData = [];
-	earthip.coord = Array;
+	earthip.ipCoord = Array;
 	earthip.IpData = function() {
-		return m.request({method: "GET", url: "db.json"}).then(function(data) {
+		m.request({method: "GET", url: "db.json"}).then(function(data) {
 			for (var key in data) {
 				earthip.attData.push(key);
 			}
 			earthip.allData = data;
+		});
+		
+		m.request({method: "GET", url: "ip.json"}).then(function(data) {
+			earthip.ipCoord = data;
 		});
 	};
 	earthip.overlay = function() {
@@ -56,11 +66,7 @@
 		ge.getFeatures().appendChild(screenOverlay);
 	};
 	earthip.getIpCoord = function(ipStr) {
-		var coord = new earthip.coord;
-		coord[0] = Math.random() * ( 90 + 1) - 30;
-		coord[1] = Math.random() * ( 180 + 1);
-		
-		return coord;
+		return earthip.ipCoord[ipStr];
 	};
 	earthip.removeAll = function() {
 		var features = ge.getFeatures().getChildNodes();
@@ -68,14 +74,21 @@
 			ge.getFeatures().removeChild(features.item(i));
 		}
 	};
-	earthip.addPoint = function(coord, name) {
+	earthip.addPoint = function(coord, name, type) {
 		// 创建地标。
 		var placemark = ge.createPlacemark('');
 		placemark.setName(name);
+		if (type) {
+			var icon = ge.createIcon('');
+			icon.setHref('http://maps.google.com/mapfiles/kml/paddle/red-circle.png');
+			var style = ge.createStyle(''); //create a new style
+			style.getIconStyle().setIcon(icon); //将图标应用到样式
+			placemark.setStyleSelector(style); //将样式应用到地标
+		}
 		// 设置地标的位置。
 		var point = ge.createPoint('');
-		point.setLatitude(coord[0]);
-		point.setLongitude(coord[1]);
+		point.setLatitude(parseFloat(coord["lat"]));
+		point.setLongitude(parseFloat(coord["long"]));
 		placemark.setGeometry(point);
 		// 向 Google 地球添加地标。
 		ge.getFeatures().appendChild(placemark);
@@ -84,21 +97,21 @@
 		var attCoord = earthip.getIpCoord(selectedIp);
 		var ips = earthip.allData[selectedIp];
 		
-		earthip.addPoint(attCoord, selectedIp);
+		earthip.addPoint(attCoord, attCoord["address"] + "(ip.exe)", 1);
 		
 		var multiGeometry = ge.createMultiGeometry('');
 		for (var idx = 0; idx < ips.length; idx ++) {
 			var ipCoord = earthip.getIpCoord(ips[idx]);
 			
 	    	var line = ge.createLineString('');
-			line.getCoordinates().pushLatLngAlt(ipCoord[0], ipCoord[1], 0);
-			line.getCoordinates().pushLatLngAlt(attCoord[0], attCoord[1], 0);
+			line.getCoordinates().pushLatLngAlt(parseFloat(ipCoord["lat"]), parseFloat(ipCoord["long"]), 0);
+			line.getCoordinates().pushLatLngAlt(parseFloat(attCoord["lat"]), parseFloat(attCoord["long"]), 0);
 			line.setTessellate(true);
 			line.setAltitudeMode(ge.ALTITUDE_CLAMP_TO_GROUND);
 			multiGeometry.getGeometries().appendChild(line);
 			
 			//添加点
-			earthip.addPoint(ipCoord, ips[idx]);
+			earthip.addPoint(ipCoord, ipCoord["address"] + "(被窃文件10个)");
 		}
 		
 		var multGeoPlacemark = ge.createPlacemark('');
@@ -111,22 +124,23 @@
 		
 		ge.getFeatures().appendChild(multGeoPlacemark);
 
+		//ge.getOptions().setFlyToSpeed(4.0);
   	    var la = ge.createLookAt('');
-		la.set(attCoord[0], attCoord[1], 0, ge.ALTITUDE_RELATIVE_TO_GROUND, -8.541, 66.213, 8000);
+		la.set(parseFloat(attCoord["lat"]), parseFloat(attCoord["long"]), 0, ge.ALTITUDE_RELATIVE_TO_GROUND, -8.541, 66.213, 8000);
 		ge.getView().setAbstractView(la);
 	};
 	earthip.showSingleIp = function(selectedIp) {
 		var attCoord = earthip.getIpCoord(selectedIp);
 		
-		earthip.addPoint(attCoord, selectedIp);
+		earthip.addPoint(attCoord, attCoord["address"] + "(10)");
 		
 		//   	    var la = ge.createLookAt('');
 		// la.set(attCoord[0], attCoord[1], 0, ge.ALTITUDE_RELATIVE_TO_GROUND, -8.541, 66.213, 8000);
 		
 		var lookAt = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
 		// 设置新的纬度值和经度值。
-		lookAt.setLatitude(attCoord[0]);
-		lookAt.setLongitude(attCoord[1]);
+		lookAt.setLatitude(parseFloat(attCoord["lat"]));
+		lookAt.setLongitude(parseFloat(attCoord["long"]));
 		lookAt.setRange(50000.0);
 		// 更新 Google 地球中的视图。
 		ge.getView().setAbstractView(lookAt);
@@ -134,22 +148,25 @@
 	earthip.controller = function() {
 		this.selectedIp = m.prop("122.124.137.19");
 		this.selectedSubIp = m.prop("");
-		this.attip = earthip.IpData();
+		
+		earthip.IpData();
 
 		this.selected = function(index) {
-			this.selectedIp(index.target.innerText);
+			var ip = index.target.innerText.toString();
+			this.selectedIp(ip);
 			this.selectedSubIp("");
 			m.redraw(true);
 			
 			earthip.removeAll();
-			earthip.showGroupIp(index.target.innerText);
+			earthip.showGroupIp(ip);
 		}.bind(this);
 		this.attipSelected = function(index) {
-			this.selectedSubIp(index.target.innerText);
+			var ip = index.target.innerText.toString();
+			this.selectedSubIp(ip);
 			m.redraw(true);
 			
 			earthip.removeAll();
-			earthip.showSingleIp(index.target.innerText);
+			earthip.showSingleIp(ip);
 			// // 获取当前视图。
 			// var lookAt = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
 			// // 设置新的纬度值和经度值。
