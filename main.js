@@ -31,6 +31,32 @@
     google.setOnLoadCallback(init);
 	
 	
+	function addPointsToLineString(lineString,lat1,lang1,lat2,lang2,steps){
+		var i;
+		var lat;
+		var lang;
+		var height;
+		
+		for(i = 0; i < steps; i++) {
+			lat = lat1+ i*(lat2-lat1)/steps;
+			lang = lang1+ i*(lang2-lang1)/steps;
+			if (i==0) height = 0;
+	        else if(i==1 || i==steps-1) height = 8130.76624025246;
+	        else if(i==2 || i==steps-2) height = 15640.4403479026;
+	  	  	else if(i==3 || i==steps-3) height = 22453.9881416349;
+	  	  	else if(i==4 || i==steps-4) height =28503.3309041539;
+	     	else if(i==5 || i==steps-5) height = 33728.0256022233;
+	     	else if(i==6 || i==steps-6) height = 38075.8688134745;
+	  	  	else if(i==7 || i==steps-7) height = 41503.4183257466;
+	  	  	else if(i==8 || i==steps-8) height = 43976.4271973102;
+	  	  	else if(i==9 || i==steps-9) height = 45470.1859409886;
+	  	  	else if(i==10) height = 45969.769413186;
+			
+			lineString.getCoordinates().pushLatLngAlt(lat,lang, height);
+		}
+		lineString.getCoordinates().pushLatLngAlt(lat2,lang2, 0); 
+	} 
+	
 	/***** ip.. ****/
 	
 	var earthip = {};
@@ -108,12 +134,23 @@
 		for (var idx = 0; idx < ips.length; idx ++) {
 			var ipCoord = earthip.getIpCoord(ips[idx]);
 			
-	    	var line = ge.createLineString('');
-			line.getCoordinates().pushLatLngAlt(parseFloat(ipCoord["lat"]), parseFloat(ipCoord["long"]), 0);
-			line.getCoordinates().pushLatLngAlt(parseFloat(attCoord["lat"]), parseFloat(attCoord["long"]), 0);
-			line.setTessellate(true);
-			line.setAltitudeMode(ge.ALTITUDE_CLAMP_TO_GROUND);
-			multiGeometry.getGeometries().appendChild(line);
+			// var line = ge.createLineString('');
+			// line.getCoordinates().pushLatLngAlt(parseFloat(ipCoord["lat"]), parseFloat(ipCoord["long"]), 0);
+			// line.getCoordinates().pushLatLngAlt(parseFloat(attCoord["lat"]), parseFloat(attCoord["long"]), 0);
+			// line.setTessellate(true);
+			// line.setAltitudeMode(ge.ALTITUDE_CLAMP_TO_GROUND);
+			// multiGeometry.getGeometries().appendChild(line);
+			
+			var lineMark = ge.createPlacemark('');
+			var lineString = ge.createLineString('');
+			lineMark.setGeometry(lineString);
+			lineString.setAltitudeMode(ge.ALTITUDE_RELATIVE_TO_GROUND);   //显示海拔相对位置
+			addPointsToLineString(lineString, parseFloat(ipCoord["lat"]), parseFloat(ipCoord["long"]), parseFloat(attCoord["lat"]), parseFloat(attCoord["long"]), 20);    //输入2端点经纬度
+			lineMark.setStyleSelector(ge.createStyle(''));
+			var lineStyle = lineMark.getStyleSelector().getLineStyle();
+			lineStyle.setWidth(2);  //粗细
+			lineStyle.getColor().set('9900ffff'); //颜色
+			ge.getFeatures().appendChild(lineMark );
 			
 			//添加点
 			earthip.addPoint(ipCoord, ipCoord["address"] + "(被窃文件10个)");
