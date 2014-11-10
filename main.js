@@ -133,8 +133,8 @@
         ge.getOptions().setFlyToSpeed(0.5);
 		var lookAt = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
         lookAt.setTilt(35.0);
-		lookAt.setLatitude(parseFloat(attCoord["lat"]);
-		lookAt.setLongitude(parseFloat(attCoord["long"]);
+		lookAt.setLatitude(parseFloat(attCoord["lat"]));
+		lookAt.setLongitude(parseFloat(attCoord["long"]));
 		lookAt.setRange(50000.0);
 		ge.getView().setAbstractView(lookAt);
 	};
