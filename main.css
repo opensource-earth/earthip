@@ -9,7 +9,7 @@ ul li a:hover { color: #000000; }
 ul li a:active { color: #3090e4; }
 /*.content { margin-left: auto; margin-right: auto; max-width: 1124px; }*/
 .content { margin-left: 0px; margin-right: 0px; }
-#title { text-align:left; font-size: 30; padding: 25px 25px 25px 25px; background: url(http://www.7188.org/uploads/allimg/120325/22364411H-0.jpg) no-repeat 10px center; }
+#title { text-align:left; font-size: 40; padding: 15px 25px 15px 125px; background: url(http://www.7188.org/uploads/allimg/120325/22364411H-0.jpg) no-repeat 10px center; color: #FEFEFE; text-shadow: 1px 1px 5px #08c, 1px 1px 0 #68a; font-style:italic;}
 
 #iplist { border:gray 1px solid; margin-right: 0px; height: 100%; background:url(http://www.7188.org/uploads/allimg/120330/22212041H-0.gif) no-repeat 10px center }
 .highlighted { font-weight: 700; border-right: 1px solid #3090e4; }

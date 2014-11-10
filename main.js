@@ -10,6 +10,11 @@
       ge = instance;
       ge.getWindow().setVisibility(true);
 	  ge.getNavigationControl().setVisibility(ge.VISIBILITY_SHOW);
+ 
+    var la = ge.createLookAt('');
+    la.set(33,105.46, 0, ge.ALTITUDE_RELATIVE_TO_GROUND,
+        0, 0, 8000000);   //最后一个参数是放大倍数，可根据页面大小调整.  第一、二位置是中国中心位置经纬度
+    ge.getView().setAbstractView(la);
 
 	  // var href = 'http://developers.google.com/kml/documentation/kmlfiles/bounce_example.kml';
 	  // google.earth.fetchKml(ge, href, kmlFinishedLoading);
@@ -124,7 +129,8 @@
 		
 		ge.getFeatures().appendChild(multGeoPlacemark);
 
-		//ge.getOptions().setFlyToSpeed(4.0);
+
+        ge.getOptions().setFlyToSpeed(0.5);
   	    var la = ge.createLookAt('');
 		la.set(parseFloat(attCoord["lat"]), parseFloat(attCoord["long"]), 0, ge.ALTITUDE_RELATIVE_TO_GROUND, -8.541, 66.213, 8000);
 		ge.getView().setAbstractView(la);
@@ -136,8 +142,10 @@
 		
 		//   	    var la = ge.createLookAt('');
 		// la.set(attCoord[0], attCoord[1], 0, ge.ALTITUDE_RELATIVE_TO_GROUND, -8.541, 66.213, 8000);
-		
+        ge.getOptions().setFlyToSpeed(0.5);
+ 
 		var lookAt = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
+        lookAt.setTilt(35.0);
 		// 设置新的纬度值和经度值。
 		lookAt.setLatitude(parseFloat(attCoord["lat"]));
 		lookAt.setLongitude(parseFloat(attCoord["long"]));
