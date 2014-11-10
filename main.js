@@ -102,7 +102,7 @@
 		var attCoord = earthip.getIpCoord(selectedIp);
 		var ips = earthip.allData[selectedIp];
 		
-		earthip.addPoint(attCoord, attCoord["address"] + "(ip.exe)", 1);
+		earthip.addPoint(attCoord, attCoord["address"] + "(窃取文件87个)", 1);
 		
 		var multiGeometry = ge.createMultiGeometry('');
 		for (var idx = 0; idx < ips.length; idx ++) {
@@ -141,7 +141,7 @@
 	earthip.showSingleIp = function(selectedIp) {
 		var attCoord = earthip.getIpCoord(selectedIp);
 		
-		earthip.addPoint(attCoord, attCoord["address"] + "(10)");
+		earthip.addPoint(attCoord, attCoord["address"] + "(被窃文件10个)");
 		
 		//   	    var la = ge.createLookAt('');
 		// la.set(attCoord[0], attCoord[1], 0, ge.ALTITUDE_RELATIVE_TO_GROUND, -8.541, 66.213, 8000);
