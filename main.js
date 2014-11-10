@@ -131,9 +131,12 @@
 
 
         ge.getOptions().setFlyToSpeed(0.5);
-  	    var la = ge.createLookAt('');
-		la.set(parseFloat(attCoord["lat"]), parseFloat(attCoord["long"]), 0, ge.ALTITUDE_RELATIVE_TO_GROUND, -8.541, 66.213, 8000);
-		ge.getView().setAbstractView(la);
+		var lookAt = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
+        lookAt.setTilt(35.0);
+		lookAt.setLatitude(parseFloat(attCoord["lat"]);
+		lookAt.setLongitude(parseFloat(attCoord["long"]);
+		lookAt.setRange(50000.0);
+		ge.getView().setAbstractView(lookAt);
 	};
 	earthip.showSingleIp = function(selectedIp) {
 		var attCoord = earthip.getIpCoord(selectedIp);
