@@ -167,14 +167,45 @@
 		ge.getFeatures().appendChild(multGeoPlacemark);
 
 
-        ge.getOptions().setFlyToSpeed(0.5);
-		var lookAt = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
-        lookAt.setTilt(35.0);
-		lookAt.setLatitude(parseFloat(attCoord["lat"]));
-		lookAt.setLongitude(parseFloat(attCoord["long"]));
-		lookAt.setRange(50000.0);
-		ge.getView().setAbstractView(lookAt);
+		earthip.animation.ip = selectedIp;
+		earthip.animation.index = -1;
+		earthip.animation.animationView();
+        // ge.getOptions().setFlyToSpeed(0.1);
+// 		var lookAt = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
+//         lookAt.setTilt(35.0);
+// 		lookAt.setLatitude(parseFloat(attCoord["lat"]));
+// 		lookAt.setLongitude(parseFloat(attCoord["long"]));
+// 		lookAt.setRange(50000.0);
+// 		ge.getView().setAbstractView(lookAt);
 	};
+	earthip.animation = {};
+	earthip.animation.ip = "";
+	earthip.animation.index = -1;
+	earthip.animation.animationView = function() {
+		setTimeout(function() {
+			var attCoord;
+			if (earthip.animation.index >= earthip.allData[earthip.animation.ip].length) {
+				return;
+			}
+		
+			if (earthip.animation.index < 0) {
+				attCoord = earthip.getIpCoord(earthip.animation.ip);
+			} else {
+				attCoord = earthip.getIpCoord(earthip.allData[earthip.animation.ip][earthip.animation.index]);
+			}
+		
+	        ge.getOptions().setFlyToSpeed(0.1);
+			var lookAt = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
+	        lookAt.setTilt(35.0);
+			lookAt.setLatitude(parseFloat(attCoord["lat"]));
+			lookAt.setLongitude(parseFloat(attCoord["long"]));
+			lookAt.setRange(50000.0);
+			ge.getView().setAbstractView(lookAt);
+		
+			earthip.animation.index ++;
+			setTimeout(earthip.animation.animationView, 5000);
+		}, (earthip.animation.index < 0) ? 0 : 5000);
+	}
 	earthip.showSingleIp = function(selectedIp) {
 		var attCoord = earthip.getIpCoord(selectedIp);
 		
