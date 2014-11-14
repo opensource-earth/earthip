@@ -11,19 +11,11 @@
       ge.getWindow().setVisibility(true);
 	  ge.getNavigationControl().setVisibility(ge.VISIBILITY_SHOW);
  
-    var la = ge.createLookAt('');
-    la.set(33,105.46, 0, ge.ALTITUDE_RELATIVE_TO_GROUND,
-        0, 0, 8000000);   //最后一个参数是放大倍数，可根据页面大小调整.  第一、二位置是中国中心位置经纬度
-    ge.getView().setAbstractView(la);
-
-	  // var href = 'http://developers.google.com/kml/documentation/kmlfiles/bounce_example.kml';
-	  // google.earth.fetchKml(ge, href, kmlFinishedLoading);
+	  locationToChina();
+	  
+	  document.getElementById("animation").onclick = toggleRotate;
+	  document.getElementById("position").onclick = locationToChina;
     }
-
-	// function kmlFinishedLoading(object) {
-	//    ge.getTourPlayer().setTour(object);
-	//    ge.getTourPlayer().play();
-	// }
 	
     function failureCB(errorCode) {
     }
@@ -57,6 +49,50 @@
 		lineString.getCoordinates().pushLatLngAlt(lat2,lang2, 0); 
 	} 
 	
+	var speed =  10;  // degrees per second
+	var lastMillis = (new Date()).getTime();
+	var isRotate = false;
+	function toggleRotate() {
+		if (isRotate) {
+			stopRotate();
+		} else {
+			startRotate();
+		}
+	}
+	function startRotate() {
+		if (isRotate) return;
+		isRotate = true;
+		
+		ge.getOptions().setFlyToSpeed(ge.SPEED_TELEPORT);
+		google.earth.addEventListener(ge, "frameend", rotateEarth);   //设置事件，地图画完事件
+		rotateEarth();  //第一次人工启动下。记住不加这一行，可能不旋转。
+	}
+	function stopRotate() {
+		isRotate = false;
+		google.earth.removeEventListener(ge,"frameend", rotateEarth);
+		ge.getOptions().setFlyToSpeed(0.5);
+	}
+    function rotateEarth() {
+		var now = (new Date()).getTime();
+		// dt is the delta-time since last tick, in seconds
+		var dt = (now - lastMillis) / 1000.0;
+		lastMillis = now;
+		
+		var lookAt = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
+		var nextLong=lookAt.getLongitude() + speed*dt;
+		if(nextLong>180)
+			nextLong=nextLong-360;
+		lookAt.set(33,nextLong, 
+                   0, ge.ALTITUDE_RELATIVE_TO_GROUND, 
+                   0, 0, 10000000);
+		ge.getView().setAbstractView(lookAt);
+	}
+	
+	function locationToChina() {
+  	    var la = ge.createLookAt('');
+  	    la.set(33,105.46, 0, ge.ALTITUDE_RELATIVE_TO_GROUND, 0, 0, 8000000); //最后一个参数是放大倍数，可根据页面大小调整.  第一、二位置是中国中心位置经纬度
+  	    ge.getView().setAbstractView(la);
+    }
 	/***** ip.. ****/
 	
 	var earthip = {};
@@ -273,7 +309,36 @@
 	};
 
 	m.module(document.getElementById("iplist"), earthip);
-	
 }());
 
 
+(function() {
+	var datetime = document.getElementById("datetime");
+	setTime();  
+	  function setTime(){  
+	      var mydate=new Date();  
+	      var year = mydate.getFullYear();  
+	      var mymonth=parseInt(mydate.getMonth()+1)<10?"0"+(mydate.getMonth()+1):mydate.getMonth()+1;  
+	      var myday= mydate.getDate();  
+	      var myweekday=mydate.getDay();  
+	      var myHours = parseInt(mydate.getHours())<10?"0"+(mydate.getHours()):mydate.getHours();  
+	      var myMinutes = mydate.getMinutes()<10?"0"+mydate.getMinutes():mydate.getMinutes();  
+	      var mySeconds = parseInt(mydate.getSeconds())<10?"0"+mydate.getSeconds():mydate.getSeconds();  
+	      if(myweekday == 0)  
+	      weekday=" 星期日 ";  
+	      else if(myweekday == 1)  
+	      weekday=" 星期一 ";  
+	      else if(myweekday == 2)  
+	      weekday=" 星期二 ";  
+	      else if(myweekday == 3)  
+	      weekday=" 星期三 ";  
+	      else if(myweekday == 4)  
+	      weekday=" 星期四 ";  
+	      else if(myweekday == 5)  
+	      weekday=" 星期五 ";  
+	      else if(myweekday == 6)  
+	      weekday=" 星期六 ";  
+	     datetime.innerHTML=year+"年"+mymonth+"月"+myday+"日 <br>"+myHours+":"+myMinutes+":"+mySeconds+" "+weekday;  
+	     setTimeout(setTime,1000);  
+	  }  
+}());

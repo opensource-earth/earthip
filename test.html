@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>Geocoding service</title>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
+	<script src='sql.js'></script>
+</head>
+  <body>
+	  <input type="file" id="dbfile">
+	  <div id="info"></div>
+	  <div id="sql"></div>
+	  <script>
+	  var queryed = new Array();
+	  var dataArray = new Array();
+	  var decodeIndex = 0;
+	  var geocoder;
+	  var db;
+		var info = document.getElementById("info");
+		var sql = document.getElementById("sql");
+	  function initialize() {
+	    geocoder = new google.maps.Geocoder();
+		
+		var dbFileElm = document.getElementById('dbfile');
+		
+		dbFileElm.onchange = function() {
+			var f = dbFileElm.files[0];
+			var r = new FileReader();
+	    	r.onload = function() {
+	        	var Uints = new Uint8Array(r.result);
+	        	db = new SQL.Database(Uints);
+		
+				// var stmt = db.prepare("SELECT * FROM 'IPToCity'");
+				var res = db.exec("SELECT * FROM IPToCity")[0];
+				var values = res.values;
+				var columns = res.columns;
+				for (var idx = 0; idx < values.length; idx ++) {
+					var value = values[idx];
+					if ((value[0] != "") && (value[1] != "") && (queryed[value[3]] == undefined)) {
+						queryed[value[3]] = "";
+						
+						var data = [];
+						for (var cIdx = 0; cIdx < columns.length; cIdx ++) {
+							data[columns[cIdx]] = value[cIdx];
+						}
+						dataArray.push(data);
+					}
+				}
+		    	/*while(stmt.step()) { //
+		        	var row = stmt.getAsObject();
+					if ((row["IP_Start"] != "") && (row["IP_End"] != "")) {
+						var data = [];
+						data["IP_Start"] = row["IP_Start"];
+						data["IP_End"] = row["IP_End"];
+						data["IP_City"] = row["IP_City"];
+						data["IP_Province"] = row["IP_Province"];
+						dataArray.push(data);
+					}
+		       	 // [...] do something with the row of result
+		    	}
+				stmt.free();*/
+				
+				decodeIndex = 0;
+				codeAddress();
+	    	}
+    	
+			r.readAsArrayBuffer(f);
+		};
+	  }
+
+	  function codeAddress() {
+	    // var address = "北京";// document.getElementById('address').value;
+	    geocoder.geocode( { 'address': dataArray[decodeIndex]["IP_City"]}, function(results, status) {
+	      if (status == google.maps.GeocoderStatus.OK) {
+			  var data = dataArray[decodeIndex];
+			  data["Lon"] = results[0].geometry.location.B.toString();
+			  data["Lat"] = results[0].geometry.location.k.toString();
+			  
+			  info.innerHTML = info.innerHTML + "<br>" + data["IP_City"] + "[" + data["Lat"] + "," + data["Lat"] + "]";
+	      } else if (status == google.maps.GeocoderStatus.OVER_QUERY_LIMIT) {
+			  setTimeout(codeAddress, 1000);
+			  return;
+	      } else if (status == google.maps.GeocoderStatus.ZERO_RESULTS) {
+			  var data = dataArray[decodeIndex];
+			  info.innerHTML = info.innerHTML + "<br>" + data["IP_City"];
+	      } else {
+	        alert('Geocode was not successful for the following reason: ' + status);
+			return;
+	      }
+		  
+		  decodeIndex ++;
+		  if (decodeIndex < dataArray.length) {
+			  codeAddress();
+		  } else {
+		  	  for (var idx = 0; idx < dataArray.length; idx ++) {
+				  var data = dataArray[idx];
+				  sql.innerHTML = sql.innerHTML + ";<br> UPDATA IPToCity SET Lon = " + data["Lon"] + ", Lat = " + data["Lat"] + "WHERE IP_City = " + data["IP_City"];
+				  // sql.innerHTML = sql.innerHTML + ";<br> UPDATA IPToCity SET Lon = " + data["Lon"] + ", Lat = " + data["Lat"] + "WHERE IP_Start = " + data["IP_Start"] + " AND IP_End = " + data["IP_End"];
+		  	  }
+		  }
+	    });
+	  }
+	  
+	  initialize();
+	  </script>
+  </body>
+</html>
