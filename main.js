@@ -49,7 +49,7 @@
 		lineString.getCoordinates().pushLatLngAlt(lat2,lang2, 0); 
 	} 
 	
-	var speed =  10;  // degrees per second
+	var speed =  12;  // degrees per second
 	var lastMillis = (new Date()).getTime();
 	var isRotate = false;
 	function toggleRotate() {
@@ -84,11 +84,14 @@
 			nextLong=nextLong-360;
 		lookAt.set(33,nextLong, 
                    0, ge.ALTITUDE_RELATIVE_TO_GROUND, 
-                   0, 0, 10000000);
+                   0, 0, 13000000);
 		ge.getView().setAbstractView(lookAt);
 	}
 	
 	function locationToChina() {
+        if (isRotate) {
+            stopRotate();
+        }
   	    var la = ge.createLookAt('');
   	    la.set(33,105.46, 0, ge.ALTITUDE_RELATIVE_TO_GROUND, 0, 0, 8000000); //最后一个参数是放大倍数，可根据页面大小调整.  第一、二位置是中国中心位置经纬度
   	    ge.getView().setAbstractView(la);
