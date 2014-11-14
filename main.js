@@ -93,7 +93,7 @@
             stopRotate();
         }
   	    var la = ge.createLookAt('');
-  	    la.set(33,105.46, 0, ge.ALTITUDE_RELATIVE_TO_GROUND, 0, 0, 8000000); //最后一个参数是放大倍数，可根据页面大小调整.  第一、二位置是中国中心位置经纬度
+  	    la.set(33,105.46, 0, ge.ALTITUDE_RELATIVE_TO_GROUND, 0, 0, 13000000); //最后一个参数是放大倍数，可根据页面大小调整.  第一、二位置是中国中心位置经纬度
   	    ge.getView().setAbstractView(la);
     }
 	/***** ip.. ****/
