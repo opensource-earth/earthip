@@ -1,9 +1,36 @@
 (function() {
 	var ge;
+	var map;
     google.load("earth", "1", {'language': 'zh_cn' , "other_params":"sensor=false"});
 
     function init() {
 		google.earth.createInstance('map3d', initCB, failureCB);
+		
+		var mapOptions = {
+		    zoom: 12,
+		    center: new google.maps.LatLng(-28.643387, 153.612224),
+		    mapTypeControl: true,
+		    mapTypeControlOptions: {
+		        style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+		        position: google.maps.ControlPosition.BOTTOM_CENTER
+		    },
+		    panControl: true,
+		    panControlOptions: {
+		        position: google.maps.ControlPosition.TOP_RIGHT
+		    },
+		    zoomControl: true,
+		    zoomControlOptions: {
+		        style: google.maps.ZoomControlStyle.LARGE,
+		        position: google.maps.ControlPosition.LEFT_CENTER
+		    },
+		    scaleControl: true,
+		    streetViewControl: true,
+		    streetViewControlOptions: {
+		        position: google.maps.ControlPosition.LEFT_TOP
+		    }
+		  }
+		  map = new google.maps.Map(document.getElementById('map-canvas'),
+		                                mapOptions);
     }
 
     function initCB(instance) {
@@ -15,6 +42,7 @@
 	  
 	  document.getElementById("animation").onclick = toggleRotate;
 	  document.getElementById("position").onclick = locationToChina;
+	  document.getElementById("goback").onclick = goback;
     }
 	
     function failureCB(errorCode) {
@@ -93,6 +121,10 @@
   	    la.set(33,105.46, 0, ge.ALTITUDE_RELATIVE_TO_GROUND, 0, 0, 8000000); //最后一个参数是放大倍数，可根据页面大小调整.  第一、二位置是中国中心位置经纬度
   	    ge.getView().setAbstractView(la);
     }
+	function goback() {
+		document.getElementById("goback").style.visibility = "hidden";
+		document.getElementById("map-canvas").style.visibility = "hidden";//visible
+	}
 	/***** ip.. ****/
 	
 	var earthip = {};
@@ -259,7 +291,15 @@
 		lookAt.setRange(50000.0);
 		// 更新 Google 地球中的视图。
 		ge.getView().setAbstractView(lookAt);
+		
+		//更新Map
+		map.setCenter(new google.maps.LatLng(attCoord["lat"], attCoord["long"]));
+		setTimeout(earthip.showMapView, 1000);
 	};
+	earthip.showMapView = function() {
+		document.getElementById("goback").style.visibility = "visible";
+		document.getElementById("map-canvas").style.visibility = "visible";
+	}
 	earthip.controller = function() {
 		this.selectedIp = m.prop("122.124.137.19");
 		this.selectedSubIp = m.prop("");

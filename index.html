@@ -8,6 +8,7 @@
 
 		<link rel="stylesheet" href="pure-min.css">
 		<script type="text/javascript" src="https://www.google.com/jsapi"> </script>
+		<script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
 		<link rel="stylesheet" href="main.css">
 		
 		<script type="text/javascript" src="mithril.js"></script>
@@ -69,6 +70,9 @@
 		
 		<input id="animation" type="button" style="position: absolute; left:33.34%; bottom: -60px; color: #FF0000; margin-left:30px; width: 50px; height: 50px;" value="动画">
 		<input id="position" type="button" style="position: absolute; left:33.34%; bottom: -60px; color: #FF0000; margin-left:90px; width: 50px; height: 50px;" value="定位">
+		
+		<div id="map-canvas" style="position:absolute; left:33.34%; top: 80px; width: 66.66%; height: 100%; z-index: 1001; visibility: hidden;"></div>
+		<input id="goback" type="button" style="position: absolute; left:33.34%; bottom: -78px; color: #FF0000; margin-left:5px; width: 80px; height: 50px; z-index: 1002; visibility: hidden;" value="返回">
 	</body>
 </html>
 
