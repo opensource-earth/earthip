@@ -1,6 +1,9 @@
 (function() {
 	var ge;
 	var map;
+    var markLatLng;
+    var isShowMap = false;
+    var selectedAssailantIp;
     google.load("earth", "1", {'language': 'zh_cn' , "other_params":"sensor=false"});
 
     function init() {
@@ -42,7 +45,7 @@
 	
 	  document.getElementById("animation").onclick = toggleRotate;
 	  document.getElementById("position").onclick = locationToChina;
-	  document.getElementById("goback").onclick = goback;
+      document.getElementById("mapswitch").onclick = mapSwitchState;
     }
 	
     function failureCB(errorCode) {
@@ -81,6 +84,9 @@
 	var lastMillis = (new Date()).getTime();
 	var isRotate = false;
 	function toggleRotate() {
+//        if(selectedAssailantIp){
+//            return startRemoveAnim();
+//        }
 		if (isRotate) {
 			stopRotate();
 		} else {
@@ -124,12 +130,26 @@
   	    la.set(33,105.46, 0, ge.ALTITUDE_RELATIVE_TO_GROUND, 0, 0, 12000000); //最后一个参数是放大倍数，可根据页面大小调整.  第一、二位置是中国中心位置经纬度
   	    ge.getView().setAbstractView(la);
     }
-	function goback() {
-		document.getElementById("goback").style.visibility = "hidden";
-		document.getElementById("map-canvas").style.visibility = "hidden";//visible
-	}
+ 
+    function mapSwitchState() {
+        if(!markLatLng){
+            return;
+        }
+        if(!isShowMap){
+			document.getElementById("map3d").style.visibility = "hidden";
+            return earthip.showMapView();
+        }
+        isShowMap = false;
+        document.getElementById("map-canvas").style.visibility = "hidden";//visible
+		document.getElementById("map3d").style.visibility = "visible";
+    }
+ 
+    function startRemoveAnim() {
+        earthip.animation.ip = selectedAssailantIp;
+        earthip.animation.index = -1;
+        earthip.animation.animationView();
+    }
 	/***** ip.. ****/
-	
 	var earthip = {};
 	earthip.attData = [];
 	earthip.allData = [];
@@ -196,21 +216,27 @@
 		ge.getFeatures().appendChild(placemark);
 	}
 	earthip.showGroupIp = function(selectedIp) {
+        stopRotate();
+        selectedAssailantIp = selectedIp;
 		var attCoord = earthip.getIpCoord(selectedIp);
 		var ips = earthip.allData[selectedIp];
-		
+	
+        markLatLng = new google.maps.LatLng(parseFloat(attCoord["lat"]), parseFloat(attCoord["long"]));
+ 
 		earthip.addPoint(attCoord, attCoord["address"] + "(窃取文件87个)", 1);
-		
+ 
+        var lookAt = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
+        lookAt.setTilt(35.0);
+        // 设置新的纬度值和经度值。
+        lookAt.setLatitude(parseFloat(attCoord["lat"]));
+        lookAt.setLongitude(parseFloat(attCoord["long"]));
+        lookAt.setRange(50000.0);
+        // 更新 Google 地球中的视图。
+        ge.getView().setAbstractView(lookAt);
+	
 		var multiGeometry = ge.createMultiGeometry('');
 		for (var idx = 0; idx < ips.length; idx ++) {
 			var ipCoord = earthip.getIpCoord(ips[idx]);
-			
-			// var line = ge.createLineString('');
-			// line.getCoordinates().pushLatLngAlt(parseFloat(ipCoord["lat"]), parseFloat(ipCoord["long"]), 0);
-			// line.getCoordinates().pushLatLngAlt(parseFloat(attCoord["lat"]), parseFloat(attCoord["long"]), 0);
-			// line.setTessellate(true);
-			// line.setAltitudeMode(ge.ALTITUDE_CLAMP_TO_GROUND);
-			// multiGeometry.getGeometries().appendChild(line);
 			
 			var lineMark = ge.createPlacemark('');
 			var lineString = ge.createLineString('');
@@ -237,17 +263,6 @@
 		
 		ge.getFeatures().appendChild(multGeoPlacemark);
 
-
-		earthip.animation.ip = selectedIp;
-		earthip.animation.index = -1;
-		earthip.animation.animationView();
-        // ge.getOptions().setFlyToSpeed(0.1);
-// 		var lookAt = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
-//         lookAt.setTilt(35.0);
-// 		lookAt.setLatitude(parseFloat(attCoord["lat"]));
-// 		lookAt.setLongitude(parseFloat(attCoord["long"]));
-// 		lookAt.setRange(50000.0);
-// 		ge.getView().setAbstractView(lookAt);
 	};
 	earthip.animation = {};
 	earthip.animation.ip = "";
@@ -278,6 +293,7 @@
 		}, (earthip.animation.index < 0) ? 0 : 5000);
 	}
 	earthip.showSingleIp = function(selectedIp) {
+        stopRotate();
 		var attCoord = earthip.getIpCoord(selectedIp);
 		
 		earthip.addPoint(attCoord, attCoord["address"] + "(被窃文件10个)");
@@ -294,15 +310,17 @@
 		lookAt.setRange(50000.0);
 		// 更新 Google 地球中的视图。
 		ge.getView().setAbstractView(lookAt);
-		
-		//更新Map
-		map.setCenter(new google.maps.LatLng(attCoord["lat"], attCoord["long"]));
-		setTimeout(earthip.showMapView, 1000);
+ 
+        markLatLng = new google.maps.LatLng(parseFloat(attCoord["lat"]), parseFloat(attCoord["long"]));
+ 
 	};
+ 
 	earthip.showMapView = function() {
-		document.getElementById("goback").style.visibility = "visible";
+        isShowMap = true;
+        initialize(markLatLng);
 		document.getElementById("map-canvas").style.visibility = "visible";
-	}
+    };
+ 
 	earthip.controller = function() {
 		this.selectedIp = m.prop("122.124.137.19");
 		this.selectedSubIp = m.prop("");
@@ -325,14 +343,6 @@
 			
 			earthip.removeAll();
 			earthip.showSingleIp(ip);
-			// // 获取当前视图。
-			// var lookAt = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
-			// // 设置新的纬度值和经度值。
-			// lookAt.setLatitude(39.98881);
-			// lookAt.setLongitude(116.474828);
-			// lookAt.setRange(5000.0);
-			// // 更新 Google 地球中的视图。
-			// ge.getView().setAbstractView(lookAt);
 		}.bind(this);
 	};
 	earthip.view = function(ctrl) {
@@ -353,8 +363,42 @@
 
 	m.module(document.getElementById("iplist"), earthip);
 }());
-
-
+ 
+function initialize(location) {
+    var myLatlng = new google.maps.LatLng(39.916056,116.369505);
+    var mapOptions = {
+        zoom: 12,
+        center: location,
+        mapTypeControl: true,
+        mapTypeControlOptions: {
+        style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+        position: google.maps.ControlPosition.BOTTOM_CENTER
+        },
+        panControl: true,
+        panControlOptions: {
+        position: google.maps.ControlPosition.TOP_RIGHT
+        },
+        zoomControl: true,
+        zoomControlOptions: {
+        style: google.maps.ZoomControlStyle.LARGE,
+        position: google.maps.ControlPosition.LEFT_CENTER
+        },
+        scaleControl: true,
+        streetViewControl: true,
+        streetViewControlOptions: {
+        position: google.maps.ControlPosition.LEFT_TOP
+    }
+    }
+    map = new google.maps.Map(document.getElementById('map-canvas'),
+                              mapOptions);
+    var marker = new google.maps.Marker({
+                                        position: location,
+                                        map: map,
+                                        title: 'Hello World!'
+                                        });
+    marker.setMap(map);
+}
+ 
 (function() {
 	var datetime = document.getElementById("datetime");
 	setTime();  
