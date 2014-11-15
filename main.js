@@ -215,6 +215,7 @@
 		ge.getFeatures().appendChild(placemark);
 	}
 	earthip.showGroupIp = function(selectedIp) {
+        stopRotate();
         selectedAssailantIp = selectedIp;
 		var attCoord = earthip.getIpCoord(selectedIp);
 		var ips = earthip.allData[selectedIp];
@@ -291,6 +292,7 @@
 		}, (earthip.animation.index < 0) ? 0 : 5000);
 	}
 	earthip.showSingleIp = function(selectedIp) {
+        stopRotate();
 		var attCoord = earthip.getIpCoord(selectedIp);
 		
 		earthip.addPoint(attCoord, attCoord["address"] + "(被窃文件10个)");
