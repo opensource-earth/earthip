@@ -3,6 +3,7 @@
 	var map;
     var markLatLng;
     var isShowMap = false;
+    var selectedAssailantIp;
     google.load("earth", "1", {'language': 'zh_cn' , "other_params":"sensor=false"});
 
     function init() {
@@ -83,6 +84,9 @@
 	var lastMillis = (new Date()).getTime();
 	var isRotate = false;
 	function toggleRotate() {
+//        if(selectedAssailantIp){
+//            return startRemoveAnim();
+//        }
 		if (isRotate) {
 			stopRotate();
 		} else {
@@ -128,13 +132,22 @@
     }
  
     function mapSwitchState() {
+        if(!markLatLng){
+            return;
+        }
         if(!isShowMap){
             return earthip.showMapView();
         }
         isShowMap = false;
         document.getElementById("map-canvas").style.visibility = "hidden";//visible
+ 
     }
  
+    function startRemoveAnim() {
+        earthip.animation.ip = selectedAssailantIp;
+        earthip.animation.index = -1;
+        earthip.animation.animationView();
+    }
 	/***** ip.. ****/
 	var earthip = {};
 	earthip.attData = [];
@@ -202,11 +215,23 @@
 		ge.getFeatures().appendChild(placemark);
 	}
 	earthip.showGroupIp = function(selectedIp) {
+        selectedAssailantIp = selectedIp;
 		var attCoord = earthip.getIpCoord(selectedIp);
 		var ips = earthip.allData[selectedIp];
-		
+	
+        markLatLng = new google.maps.LatLng(parseFloat(attCoord["lat"]), parseFloat(attCoord["long"]));
+ 
 		earthip.addPoint(attCoord, attCoord["address"] + "(窃取文件87个)", 1);
-		
+ 
+        var lookAt = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
+        lookAt.setTilt(35.0);
+        // 设置新的纬度值和经度值。
+        lookAt.setLatitude(parseFloat(attCoord["lat"]));
+        lookAt.setLongitude(parseFloat(attCoord["long"]));
+        lookAt.setRange(50000.0);
+        // 更新 Google 地球中的视图。
+        ge.getView().setAbstractView(lookAt);
+	
 		var multiGeometry = ge.createMultiGeometry('');
 		for (var idx = 0; idx < ips.length; idx ++) {
 			var ipCoord = earthip.getIpCoord(ips[idx]);
@@ -236,10 +261,6 @@
 		
 		ge.getFeatures().appendChild(multGeoPlacemark);
 
-
-		earthip.animation.ip = selectedIp;
-		earthip.animation.index = -1;
-		earthip.animation.animationView();
 	};
 	earthip.animation = {};
 	earthip.animation.ip = "";
@@ -289,9 +310,6 @@
  
         markLatLng = new google.maps.LatLng(parseFloat(attCoord["lat"]), parseFloat(attCoord["long"]));
  
-        if(isShowMap){
-            earthip.showMapView();
-        }
 	};
  
 	earthip.showMapView = function() {
