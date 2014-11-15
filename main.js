@@ -136,11 +136,12 @@
             return;
         }
         if(!isShowMap){
+			document.getElementById("map3d").style.visibility = "hidden";
             return earthip.showMapView();
         }
         isShowMap = false;
         document.getElementById("map-canvas").style.visibility = "hidden";//visible
- 
+		document.getElementById("map3d").style.visibility = "visible";
     }
  
     function startRemoveAnim() {
