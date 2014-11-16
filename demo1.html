@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>Geocoding service</title>
+	<script src='sql.js'></script>
+	<script src='ip.js'></script>
+</head>
+  <body>
+	  <input type="file" id="dbfile">
+	  <div id="info"></div>
+	  <div id="sql"></div>
+	  <script>
+	  var db;
+	  var Uints = ipData;
+  	db = new SQL.Database(Uints);
+
+
+	var ipstr = "192.168.22.1";
+    var iparr = ipstr.split('.');
+	var ipint = [];
+    for (var x = 0; x < iparr.length; x++) {
+		ipint[x] = parseInt(iparr[x]);
+    }   
+    var ip = (256 * 256 * 256 * ipint[0] + 256 * 256 * ipint[1] + 256 * ipint[2] + ipint[3]); 
+	
+	
+	// var stmt = db.prepare("SELECT * FROM 'IPToCity'");
+	var res = db.exec("SELECT Lat, Lon, IP_City FROM IPToCity WHERE IP_Start < " + ip + " AND  IP_End > " + ip)[0];
+	var values = res.values;
+	var columns = res.columns;
+	for (var idx = 0; idx < values.length; idx ++) {
+		var value = values[idx];
+	}
+	
+
+	  </script>
+  </body>
+</html>

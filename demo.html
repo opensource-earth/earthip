@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>Geocoding service</title>
+	<script src='sql.js'></script>
+</head>
+  <body>
+	  <input type="file" id="dbfile">
+	  <div id="info"></div>
+	  <div id="sql"></div>
+<script>
+var dbFileElm = document.getElementById('dbfile');
+dbFileElm.onchange = function() {
+  var f = dbFileElm.files[0];
+  var r = new FileReader();
+     r.onload = function() {
+         var info = document.getElementById("info");
+         var text = "";
+	 var Uints = new Uint8Array(r.result);
+         for (var idx = 0; idx < Uints.length; idx++) {
+             text += "," + Uints[idx];
+         }
+	
+info.innerHTML = text;
+     }
+     r.readAsArrayBuffer(f);
+}
+</script>
+</body>
+</html>

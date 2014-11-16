@@ -1,12 +1,16 @@
 (function() {
 	var ge;
 	var map;
+	var db;
     var markLatLng;
     var isShowMap = false;
     var selectedAssailantIp;
     google.load("earth", "1", {'language': 'zh_cn' , "other_params":"sensor=false"});
 
     function init() {
+		var Uints = ipData;
+		db = new SQL.Database(Uints);
+	
 		google.earth.createInstance('map3d', initCB, failureCB);
 		
 		var mapOptions = {
@@ -155,7 +159,7 @@
 	earthip.allData = [];
 	earthip.ipCoord = Array;
 	earthip.IpData = function() {
-		m.request({method: "GET", url: "db.json"}).then(function(data) {
+		m.request({method: "GET", url: "db.jsp"}).then(function(data) {
 			for (var key in data) {
 				earthip.attData.push(key);
 			}
@@ -188,7 +192,21 @@
 		ge.getFeatures().appendChild(screenOverlay);
 	};
 	earthip.getIpCoord = function(ipStr) {
-		return earthip.ipCoord[ipStr];
+		var iparr = ipStr.split('.');
+		var ipint = [];
+		for (var x = 0; x < iparr.length; x++) {
+			ipint[x] = parseInt(iparr[x]);
+		}   
+		var ip = (256 * 256 * 256 * ipint[0] + 256 * 256 * ipint[1] + 256 * ipint[2] + ipint[3]); 
+	
+		var res = db.exec("SELECT Lat, Lon, IP_City FROM IPToCity WHERE IP_Start < " + ip + " AND  IP_End > " + ip)[0];
+		var values = res.values;
+		if (values.length > 0) {
+			return {"lat" : values[0][0], "long" : values[0][1], "address" : values[0][2]};	
+		}
+		return {"lat" : "22.63", "long" : "120.31", "address" : "台湾"};
+		
+		// return earthip.ipCoord[ipStr];
 	};
 	earthip.removeAll = function() {
 		var features = ge.getFeatures().getChildNodes();
