@@ -5,7 +5,6 @@
 <% 
 try{ 
   Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
-Class.forName("org.sqlite.JDBC");  
 } 
 catch(ClassNotFoundException e){ 
   out.print(e); 
