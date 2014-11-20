@@ -447,3 +447,30 @@ function initialize(location) {
 	     setTimeout(setTime,1000);  
 	  }  
 }());
+
+(function() {
+	// var height = 80;
+// 	var width  = 100;
+// 	//Create graphics object from the graphics div
+//     var gr = new jxGraphics(document.getElementById('graphics'));
+// 	//Define pens to draw outline of the shapes
+// 	var penRed = new jxPen(new jxColor('red'), '1px');
+//
+// 	var curvePoints = [new jxPoint(0, 0), new jxPoint(100, 80)];
+//
+// 	// var line = new jxLine(new jxPoint(0, 0), new jxPoint(100, 80), penRed);
+// 	var curve = new jxClosedCurve(curvePoints, penRed)
+// 	function setTime() {
+// 		var y = Math.floor(Math.random() * (height + 1));
+//
+// 		var curvePoints = new Array();
+// 		curvePoints[0] = new jxPoint(0, 0);
+// 		curvePoints[1] = new jxPoint(100, y);
+// 		line.points = curvePoints;
+// 		line.draw(gr);
+//
+// 		setTimeout(setTime,100);
+// 	}
+//
+// 	setTime();
+}());
