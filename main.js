@@ -9,10 +9,11 @@
 
     function init() {
 		var Uints = ipData;
-		db = new SQL.Database(Uints);
+		db = new SQL.Database(Uints); /* 数据库初始化 */
 	
-		google.earth.createInstance('map3d', initCB, failureCB);
+		google.earth.createInstance('map3d', initCB, failureCB); /* 3D地图初始化 */
 		
+		/* 2D地图初始化 */
 		var mapOptions = {
 		    zoom: 12,
 		    center: new google.maps.LatLng(-28.643387, 153.612224),
@@ -47,6 +48,7 @@
  
 	  locationToChina();
 	
+	/* 挂载3个按钮的事件 */
 	  document.getElementById("animation").onclick = toggleRotate;
 	  document.getElementById("position").onclick = locationToChina;
       document.getElementById("mapswitch").onclick = mapSwitchState;
@@ -57,7 +59,7 @@
 
     google.setOnLoadCallback(init);
 	
-	
+	/* 绘制点到点的弧线的函数 */
 	function addPointsToLineString(lineString,lat1,lang1,lat2,lang2,steps){
 		var i;
 		var lat;
@@ -87,7 +89,7 @@
 	var speed =  12;  // degrees per second
 	var lastMillis = (new Date()).getTime();
 	var isRotate = false;
-	function toggleRotate() {
+	function toggleRotate() { /* 旋转动画切换 */
 //        if(selectedAssailantIp){
 //            return startRemoveAnim();
 //        }
@@ -97,7 +99,7 @@
 			startRotate();
 		}
 	}
-	function startRotate() {
+	function startRotate() { /* 开始旋转 */
 		if (isRotate) return;
 		isRotate = true;
 		
@@ -105,12 +107,12 @@
 		google.earth.addEventListener(ge, "frameend", rotateEarth);   //设置事件，地图画完事件
 		rotateEarth();  //第一次人工启动下。记住不加这一行，可能不旋转。
 	}
-	function stopRotate() {
+	function stopRotate() {  /* 结束旋转 */
 		isRotate = false;
 		google.earth.removeEventListener(ge,"frameend", rotateEarth);
 		ge.getOptions().setFlyToSpeed(0.5);
 	}
-    function rotateEarth() {
+    function rotateEarth() { /* 真正的旋转效果函数 */
 		var now = (new Date()).getTime();
 		// dt is the delta-time since last tick, in seconds
 		var dt = (now - lastMillis) / 1000.0;
@@ -126,7 +128,7 @@
 		ge.getView().setAbstractView(lookAt);
 	}
 	
-	function locationToChina() {
+	function locationToChina() { /* 定位到中国函数 */
         if (isRotate) {
             stopRotate();
         }
@@ -135,7 +137,7 @@
   	    ge.getView().setAbstractView(la);
     }
  
-    function mapSwitchState() {
+    function mapSwitchState() { /* Earth和Map地图切换函数。通过设置对应Div的是否现实来实现切换效果 */
         if(!markLatLng){
             return;
         }
@@ -158,7 +160,7 @@
 	earthip.attData = [];
 	earthip.allData = [];
 	earthip.ipCoord = Array;
-	earthip.IpData = function() {
+	earthip.IpData = function() { /* 获取ip数据函数 */
 		m.request({method: "GET", url: "db.jsp"}).then(function(data) {
 			for (var key in data) {
 				earthip.attData.push(key);
@@ -170,7 +172,7 @@
 			earthip.ipCoord = data;
 		});
 	};
-	earthip.overlay = function() {
+	earthip.overlay = function() { /* 添加overlay，现在没有用到 */
 		var element = document.getElementById("map3d");
 		// 创建 ScreenOverlay
 		var screenOverlay = ge.createScreenOverlay('');
@@ -191,7 +193,7 @@
 		// 向Google地球添加 ScreenOverlay
 		ge.getFeatures().appendChild(screenOverlay);
 	};
-	earthip.getIpCoord = function(ipStr) {
+	earthip.getIpCoord = function(ipStr) { /* 通过ip查询经纬度信息函数 */
 		var iparr = ipStr.split('.');
 		var ipint = [];
 		for (var x = 0; x < iparr.length; x++) {
@@ -208,13 +210,13 @@
 		
 		// return earthip.ipCoord[ipStr];
 	};
-	earthip.removeAll = function() {
+	earthip.removeAll = function() { /* 删除所有的地图元素，用来删除前一次添加的ip的点 */
 		var features = ge.getFeatures().getChildNodes();
 		for (var i = 0; i < features.getLength(); i ++) {
 			ge.getFeatures().removeChild(features.item(i));
 		}
 	};
-	earthip.addPoint = function(coord, name, type) {
+	earthip.addPoint = function(coord, name, type) { /* 添加一个IP点到地图 */
 		// 创建地标。
 		var placemark = ge.createPlacemark('');
 		placemark.setName(name);
@@ -233,7 +235,7 @@
 		// 向 Google 地球添加地标。
 		ge.getFeatures().appendChild(placemark);
 	}
-	earthip.showGroupIp = function(selectedIp) {
+	earthip.showGroupIp = function(selectedIp) { /* 现实一组IP点，对应于点击攻击者ip */
         stopRotate();
         selectedAssailantIp = selectedIp;
 		var attCoord = earthip.getIpCoord(selectedIp);
@@ -253,7 +255,7 @@
         ge.getView().setAbstractView(lookAt);
 	
 		var multiGeometry = ge.createMultiGeometry('');
-		for (var idx = 0; idx < ips.length; idx ++) {
+		for (var idx = 0; idx < ips.length; idx ++) { /* 通过for循环添加所有的ip */
 			var ipCoord = earthip.getIpCoord(ips[idx]);
 			
 			var lineMark = ge.createPlacemark('');
@@ -285,7 +287,7 @@
 	earthip.animation = {};
 	earthip.animation.ip = "";
 	earthip.animation.index = -1;
-	earthip.animation.animationView = function() {
+	earthip.animation.animationView = function() { /* 点击攻击者ip后的地图动画，通过timer来实现对所有被攻击ip的浏览动画 */
 		setTimeout(function() {
 			var attCoord;
 			if (earthip.animation.index >= earthip.allData[earthip.animation.ip].length) {
@@ -310,7 +312,7 @@
 			setTimeout(earthip.animation.animationView, 5000);
 		}, (earthip.animation.index < 0) ? 0 : 5000);
 	}
-	earthip.showSingleIp = function(selectedIp) {
+	earthip.showSingleIp = function(selectedIp) { /* 显示单个ip。对应于点击被攻击者ip */
         stopRotate();
 		var attCoord = earthip.getIpCoord(selectedIp);
 		
@@ -320,6 +322,7 @@
 		// la.set(attCoord[0], attCoord[1], 0, ge.ALTITUDE_RELATIVE_TO_GROUND, -8.541, 66.213, 8000);
         ge.getOptions().setFlyToSpeed(0.5);
  
+ 	   /* 一个简单的转到对应点的动画效果 */
 		var lookAt = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
         lookAt.setTilt(35.0);
 		// 设置新的纬度值和经度值。
@@ -333,13 +336,13 @@
  
 	};
  
-	earthip.showMapView = function() {
+	earthip.showMapView = function() { /* 显示2D地图 */
         isShowMap = true;
         initialize(markLatLng);
 		document.getElementById("map-canvas").style.visibility = "visible";
     };
  
-	earthip.controller = function() {
+	earthip.controller = function() { /* 这个函数暂时可以不用管。是用的一个js框架需要的 */
 		this.selectedIp = m.prop("122.124.137.19");
 		this.selectedSubIp = m.prop("");
 		
@@ -363,7 +366,7 @@
 			earthip.showSingleIp(ip);
 		}.bind(this);
 	};
-	earthip.view = function(ctrl) {
+	earthip.view = function(ctrl) { /* 通过框架返回的html的效果，可以不管，这里动态形成左边ip的列表 */
 		return [m("div.pure-u-1-2", m("ul", [m("li.head", "攻击者IP"), earthip.attData.map(function(item, iIndex) {
 			if (item == ctrl.selectedIp()) {
 				return m("li", m("a.highlighted[href='#']", {onclick: ctrl.selected}, item));
@@ -382,7 +385,7 @@
 	m.module(document.getElementById("iplist"), earthip);
 }());
  
-function initialize(location) {
+function initialize(location) { /* 地图初始化 */
     var myLatlng = new google.maps.LatLng(39.916056,116.369505);
     var mapOptions = {
         zoom: 12,
@@ -417,6 +420,7 @@ function initialize(location) {
     marker.setMap(map);
 }
  
+/* 时间现实的js代码 */
 (function() {
 	var datetime = document.getElementById("datetime");
 	setTime();  
