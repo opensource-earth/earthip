@@ -124,7 +124,7 @@
 			nextLong = nextLong-360;
 		lookAt.set(33,nextLong, 
                    0, ge.ALTITUDE_RELATIVE_TO_GROUND, 
-                   0, 0, 14000000);
+                   0, 0, 25000000);
 		ge.getView().setAbstractView(lookAt);
 	}
 	
@@ -133,7 +133,7 @@
             stopRotate();
         }
   	    var la = ge.createLookAt('');
-  	    la.set(33,105.46, 0, ge.ALTITUDE_RELATIVE_TO_GROUND, 0, 0, 12000000); //最后一个参数是放大倍数，可根据页面大小调整.  第一、二位置是中国中心位置经纬度
+  	    la.set(33,105.46, 0, ge.ALTITUDE_RELATIVE_TO_GROUND, 0, 0, 25000000); //最后一个参数是放大倍数，可根据页面大小调整.  第一、二位置是中国中心位置经纬度
   	    ge.getView().setAbstractView(la);
     }
  
@@ -152,7 +152,7 @@
  
     function startRemoveAnim() {
         earthip.animation.ip = selectedAssailantIp;
-        earthip.animation.index = -1;
+        earthip.animation.index = 0;
         earthip.animation.animationView();
     }
 	/***** ip.. ****/
@@ -240,10 +240,21 @@
         selectedAssailantIp = selectedIp;
 		var attCoord = earthip.getIpCoord(selectedIp);
 		var ips = earthip.allData[selectedIp];
-	
+		var showword;
         markLatLng = new google.maps.LatLng(parseFloat(attCoord["lat"]), parseFloat(attCoord["long"]));
- 
-		earthip.addPoint(attCoord, attCoord["address"] + "(窃取文件87个)", 1);
+		
+		showword = attCoord["address"] + "(控制主机:"+ips.length+")";
+				
+		//
+		if(selectedIp == "122.117.72.151"){
+			showword = attCoord["address"] + "(控制主机111:"+ips.length+")";
+		}
+	
+		if(selectedIp == "122.124.137.19"){
+			showword = attCoord["address"] + "(控制主机222:"+ips.length+")";
+		}		
+		
+		earthip.addPoint(attCoord, showword, 1);
  
         var lookAt = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
         lookAt.setTilt(35.0);
@@ -252,7 +263,7 @@
         lookAt.setLongitude(parseFloat(attCoord["long"]));
         lookAt.setRange(50000.0);
         // 更新 Google 地球中的视图。
-        ge.getView().setAbstractView(lookAt);
+        //ge.getView().setAbstractView(lookAt);
 	
 		var multiGeometry = ge.createMultiGeometry('');
 		for (var idx = 0; idx < ips.length; idx ++) { /* 通过for循环添加所有的ip */
@@ -270,7 +281,7 @@
 			ge.getFeatures().appendChild(lineMark);
 			
 			//添加点
-			earthip.addPoint(ipCoord, ipCoord["address"] + "(被窃文件10个)");
+			earthip.addPoint(ipCoord, ipCoord["address"]);
 		}
 		
 		var multGeoPlacemark = ge.createPlacemark('');
@@ -283,6 +294,7 @@
 		
 		ge.getFeatures().appendChild(multGeoPlacemark);
 
+		startRemoveAnim();
 	};
 	earthip.animation = {};
 	earthip.animation.ip = "";
@@ -290,6 +302,20 @@
 	earthip.animation.animationView = function() { /* 点击攻击者ip后的地图动画，通过timer来实现对所有被攻击ip的浏览动画 */
 		setTimeout(function() {
 			var attCoord;
+			
+			if(earthip.animation.index >= 3){
+				attCoord = earthip.getIpCoord(earthip.animation.ip);
+				ge.getOptions().setFlyToSpeed(0.5);
+				var lookAt = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
+				lookAt.setTilt(35.0);
+				lookAt.setLatitude(parseFloat(attCoord["lat"]));
+				lookAt.setLongitude(parseFloat(attCoord["long"]));
+				lookAt.setRange(50000.0);
+				ge.getView().setAbstractView(lookAt);
+				return;
+			}
+			
+			
 			if (earthip.animation.index >= earthip.allData[earthip.animation.ip].length) {
 				return;
 			}
@@ -300,23 +326,23 @@
 				attCoord = earthip.getIpCoord(earthip.allData[earthip.animation.ip][earthip.animation.index]);
 			}
 		
-	        ge.getOptions().setFlyToSpeed(0.1);
+	        ge.getOptions().setFlyToSpeed(0.5);
 			var lookAt = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
 	        lookAt.setTilt(35.0);
 			lookAt.setLatitude(parseFloat(attCoord["lat"]));
 			lookAt.setLongitude(parseFloat(attCoord["long"]));
 			lookAt.setRange(50000.0);
 			ge.getView().setAbstractView(lookAt);
-		
 			earthip.animation.index ++;
-			setTimeout(earthip.animation.animationView, 5000);
-		}, (earthip.animation.index < 0) ? 0 : 5000);
+			setTimeout(earthip.animation.animationView, 2000);
+			
+		}, (earthip.animation.index < 0) ? 0 : 2000);
 	}
 	earthip.showSingleIp = function(selectedIp) { /* 显示单个ip。对应于点击被攻击者ip */
         stopRotate();
 		var attCoord = earthip.getIpCoord(selectedIp);
-		
-		earthip.addPoint(attCoord, attCoord["address"] + "(被窃文件10个)");
+		var ipnum = random(5,50);
+		earthip.addPoint(attCoord, attCoord["address"]+ "(被窃数据量:"+ipnum+"M)");
 		
 		//   	    var la = ge.createLookAt('');
 		// la.set(attCoord[0], attCoord[1], 0, ge.ALTITUDE_RELATIVE_TO_GROUND, -8.541, 66.213, 8000);
@@ -367,13 +393,13 @@
 		}.bind(this);
 	};
 	earthip.view = function(ctrl) { /* 通过框架返回的html的效果，可以不管，这里动态形成左边ip的列表 */
-		return [m("div.pure-u-1-2", m("ul", [m("li.head", "攻击者IP"), earthip.attData.map(function(item, iIndex) {
+		return [m("div.pure-u-1-2", m("ul", [m("li.head", "攻击IP"), earthip.attData.map(function(item, iIndex) {
 			if (item == ctrl.selectedIp()) {
 				return m("li", m("a.highlighted[href='#']", {onclick: ctrl.selected}, item));
 			} else {
 				return m("li", m("a[href='#']", {onclick: ctrl.selected}, item));
 			}
-		})])), m("div.pure-u-1-2", m("ul", [m("li.head", "被攻击者IP"), earthip.allData[ctrl.selectedIp()].map(function(item, iIndex) {
+		})])), m("div.pure-u-1-2", m("ul", [m("li.head", "被攻击IP"), earthip.allData[ctrl.selectedIp()].map(function(item, iIndex) {
 			if (item == ctrl.selectedSubIp()) {
 				return m("li", m("a.selected[href='#']", {onclick: ctrl.attipSelected}, item));
 			} else {
@@ -419,7 +445,11 @@ function initialize(location) { /* 地图初始化 */
                                         });
     marker.setMap(map);
 }
- 
+function random(min,max){
+
+    return Math.floor(min+Math.random()*(max-min));
+
+}
 /* 时间现实的js代码 */
 (function() {
 	var datetime = document.getElementById("datetime");

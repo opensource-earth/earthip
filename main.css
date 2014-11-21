@@ -1,16 +1,16 @@
 body { width: 100%; height: 100%; }
 /* 左边表格的css设置 */
 ul { list-style: none; padding: 1px; margin: 0px; }
-ul li { text-align: center; line-height: 30px; margin-left: 0px; }
-ul .head { background: #EEEEEE; line-height: 40px; text-align: center; margin-left: 0px; color: #989898; }
-ul li a { text-decoration: none; text-color: #EEEEEE; display: block; width: 100%; }
-ul li a:link { color: #AAAAAA; } /* 默认颜色 */
-ul li a:visited { color: #AAAAAA; } /* 浏览过的颜色 */
+ul li { text-align: left; font-size: 26 ;line-height: 45px; margin-left: 40px; }
+ul .head { background: #EEEEEE; line-height: 60px; text-align: center; margin-left: 0px; color: #0000FF; font-weight:900;font-size: 30;}
+ul li a { text-decoration: none; text-color: #EEEEEE; display: block; width: 100%;font-weight:bold; }
+ul li a:link { color: #000000; } /* 默认颜色 */
+ul li a:visited { color: #000000; } /* 浏览过的颜色 */
 ul li a:hover { color: #000000; } /* 鼠标经过时的颜色 */
-ul li a:active { color: #3090e4; } /* 点击后的颜色 */
+ul li a:active { color: #000000; } /* 点击后的颜色 */
 /*.content { margin-left: auto; margin-right: auto; max-width: 1124px; }*/
 .content { margin-left: 0px; margin-right: 0px; }
-#title { text-align:left; line-height: 90px; font-size: 40; padding: 0px 25px 0px 55px; height: 80px; background: url(http://www.7188.org/uploads/allimg/120325/22364411H-0.jpg) repeat 10px center; color: #FEFEFE; text-shadow: 1px 1px 5px #08c, 1px 1px 0 #68a; font-style:italic;} /* 标题的css属性 */
+#title { text-align:center; line-height: 60px; font-size: 40; padding: 0px 25px 0px 55px; height: 65px; background: #0000FF; color: #FFFF00; font-style:normal; font-weight:3000;font-weight:bold;} /* 标题的css属性 */
 
 #iplist { border:gray 1px solid #3090e4; margin-right: 0px; height: 100%; background:url(http://www.7188.org/uploads/allimg/120330/22212041H-0.gif) repeat 10px center } /* 左边表格的background图片 */
 .highlighted { border-right: 1px solid }
