@@ -194,6 +194,11 @@
 		ge.getFeatures().appendChild(screenOverlay);
 	};
 	earthip.getIpCoord = function(ipStr) { /* 通过ip查询经纬度信息函数 */
+		var ipCoord = earthip.ipCoord[ipStr];
+		if (ipCoord != undefined) {
+			return ipCoord;
+		}
+		
 		var iparr = ipStr.split('.');
 		var ipint = [];
 		for (var x = 0; x < iparr.length; x++) {
