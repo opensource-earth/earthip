@@ -195,7 +195,7 @@
 		ge.getFeatures().appendChild(screenOverlay);
 	};
 	earthip.getIpCoord = function(ipStr) { /* 通过ip查询经纬度信息函数 */
-		var ipCoord = earthip.ipCoord[ipStr];
+		/*var ipCoord = earthip.ipCoord[ipStr];
 		if (ipCoord != undefined) {
 			return ipCoord;
 		}
@@ -212,9 +212,11 @@
 		if (values.length > 0) {
 			return {"lat" : values[0][0], "long" : values[0][1], "address" : values[0][2]};	
 		}
-		return {"lat" : "22.63", "long" : "120.31", "address" : "台湾"};
+		return {"lat" : "22.63", "long" : "120.31", "address" : "台湾"};*/
 		
 		// return earthip.ipCoord[ipStr];
+		
+		return earthip.queryIpCoord[ipStr];
 	};
 	earthip.removeAll = function() { /* 删除所有的地图元素，用来删除前一次添加的ip的点 */
 		var features = ge.getFeatures().getChildNodes();
@@ -394,8 +396,9 @@
 			this.selectedIp(ip);
 			this.selectedSubIp("");
 
-			m.request({method: "GET", url: "ip.jsp?iparray=223.20.16.181,116.20.11.23"}).then(function(data) {
-				earthip.ipCoord = data;
+			var ips =  earthip.allData[ip].concat(ip);
+			m.request({method: "GET", url: "ip.jsp?iparray=" + ips.join(",")}).then(function(data) {
+				earthip.queryIpCoord = data;
 				
 				m.redraw(true);
 				earthip.removeAll();
