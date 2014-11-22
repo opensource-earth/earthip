@@ -342,7 +342,7 @@
 			earthip.animation.index ++;
 			setTimeout(earthip.animation.animationView, 2000);
 			
-		}, (earthip.animation.index < 0) ? 0 : 2000);
+		}, (earthip.animation.index == 0) ? 0 : 2000);
 	}
 	earthip.showSingleIp = function(selectedIp) { /* 显示单个ip。对应于点击被攻击者ip */
         stopRotate();
