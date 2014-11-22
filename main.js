@@ -160,6 +160,7 @@
 	earthip.attData = [];
 	earthip.allData = [];
 	earthip.ipCoord = Array;
+	earthip.queryIpCoord = Array;
 	earthip.IpData = function() { /* 获取ip数据函数 */
 		m.request({method: "GET", url: "db.jsp"}).then(function(data) {
 			for (var key in data) {
@@ -379,14 +380,27 @@
 		
 		earthip.IpData();
 
+		// this.selected = function(index) {
+		// 	var ip = index.target.innerText.toString();
+		// 	this.selectedIp(ip);
+		// 	this.selectedSubIp("");
+		// 	m.redraw(true);
+		//
+		// 	earthip.removeAll();
+		// 	earthip.showGroupIp(ip);
+		// }.bind(this);
 		this.selected = function(index) {
 			var ip = index.target.innerText.toString();
 			this.selectedIp(ip);
 			this.selectedSubIp("");
-			m.redraw(true);
-			
-			earthip.removeAll();
-			earthip.showGroupIp(ip);
+
+			m.request({method: "GET", url: "ip.jsp?iparray=223.20.16.181,116.20.11.23"}).then(function(data) {
+				earthip.ipCoord = data;
+				
+				m.redraw(true);
+				earthip.removeAll();
+				earthip.showGroupIp(ip);
+			});
 		}.bind(this);
 		this.attipSelected = function(index) {
 			var ip = index.target.innerText.toString();
